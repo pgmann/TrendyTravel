@@ -1,0 +1,95 @@
+body {
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+#header {
+    background: #62ec62;
+    margin: -8px;
+    position: sticky;
+    top: 0;
+    padding: 20px;
+    user-select: none;
+    z-index: 1000;
+}
+
+.rollover img {
+    width: 400px;
+    height: 200px;
+    object-fit: cover;
+    display: block;
+}
+
+#slideshow-wrapper {
+    display: flex;
+    align-items: center;
+}
+
+#slideshow-wrapper > button {
+    margin: 5px;
+}
+
+#slideshow img {
+    width: 600px;
+    max-width: 100%;
+    height: 300px;
+    object-fit: cover;
+}
+
+.rollover {
+    display: inline-block;
+    position: relative;
+    overflow: hidden;
+}
+
+.rollover> :first-child {
+    transition: transform 0.25s;
+}
+
+.rollover:hover> :first-child {
+    transform: scale(1.1);
+}
+
+.rollover> :not(:first-child) {
+    transition: opacity 0.25s;
+    opacity: 1;
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 40px;
+}
+
+.rollover:not(:hover)> :not(:first-child) {
+    opacity: 0;
+}
+
+#slideshow> :not(.active-slide) {
+    display: none;
+}
+
+#copyright-attribution {
+    color: gray;
+    display: inline;
+}
+
+#copyright-attribution[open] {
+    background-color: lightgray;
+}
+
+#copyright-attribution summary {
+    padding-left: 10px;
+    outline: none;
+    cursor: pointer;
+}
+
+#copyright-attribution[open] summary {
+    background-color: gray;
+    color: white;
+}
+
+#copyright-attribution ul {
+    padding-right: 40px;
+}

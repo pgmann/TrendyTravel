@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>| Trendy Travel Agency</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/script.js"></script>
+    <script>
+        // data store for holiday destination details
+        var destData = {
+            'County Kerry': {
+                about: "Kerry boasts some of the most scenic spots in Ireland, including the Dingle harbour and Ring of Kerry.",
+                cost: 80,
+                imgs: ['ring_of_kerry.jpg', 'kerry_cliffs.jpg', 'dingle_harbour.jpg']
+            },
+            London: {
+                about: "London is a busy city packed with things to do and places to see. From the iconic London Eye to the Aquarium and Science Museum, there'll be plenty to keep you busy! There are also many cultural museums and historic buildings to visit.",
+                cost: 120,
+                imgs: ['london_bridge.jpg', 'buckingham_palace.jpg', 'trafalgar_square.jpg']
+            },
+            'San Sebastian': {
+                about: "",
+                cost: 200,
+                imgs: ['san_sebastian.jpg', 'san_sebastian_2.jpg', 'san_sebastian_beach.jpg']
+            }
+        }
+        // determine the destination to display based on current URL hash component
+        var dest = window.location.hash.length <= 1 ? null : decodeURIComponent(window.location.hash.substring(1));
+        window.addEventListener("DOMContentLoaded", () => {
+            // ensure valid destination
+            if (dest in destData) {
+                // update page title and about text to be about the current destination
+                document.title = dest + " " + document.title;
+                destination.innerHTML = dest;
+                about.innerHTML = destData[dest].about;
+                // populate slideshow
+                var first = true;
+                for (let src of destData[dest].imgs) {
+                    var img = document.createElement("img");
+                    img.src = "media/" + src;
+                    if (first) {
+                        img.classList.add("active-slide");
+                        first = false;
+                    }
+                    slideshow.appendChild(img);
+                }
+                // autofill name from previous forms if found
+                var prevName;
+                try {
+                    prevName = localStorage.getItem("name");
+                } catch (ignored) {
+                    // MS Edge and Internet Explorer throw an unspecified error
+                    // when accessing localStorage on a file:/// url
+                }
+                // instead of using custName.value to set just the current value,
+                // the setAttribute method is used to also modify the default value used when the form is reset.
+                if (prevName) custName.setAttribute("value", prevName);
+                // autofill today's date
+                DoA.setAttribute("value", new Date().toLocaleDateString('en-CA'));
+                // update booking form calculations
+                updateBookingCalculations();
+
+                // make sure the form is valid before submitting it
+                book.onsubmit = validateBooking;
+            } else {
+                // invalid destination name, show error message with link to go to index
+                dest = null;
+                document.title = "Not Found " + document.title;
+                destination.innerHTML = "Not Found";
+                about.innerHTML = "Sorry about this, you've been sent to a destination which doesn't exist at the moment. Please <a href='index.html'>click here</a> to go back to the home page.";
+                details.style.display = "none";
+            }
+        });
+        function updateBookingCalculations() {
+            if (!dest) return;
+
+            // update cost
+            var cost = destData[dest].cost;
+            pppnCost.innerHTML = cost;
+            if (numPeople.value >= 1 && numNights.value >= 1) {
+                // formula for total holiday cost
+                totalCost.innerHTML = cost * numPeople.value * numNights.value;
+            } else {
+                // to prevent showing negative numbers on invalid input, print ??? instead
+                totalCost.innerHTML = "???";
+            }
+
+            // update departure date
+            var depart = new Date(DoA.value);
+            depart.setDate(depart.getDate() + Number(numNights.value));
+            DoD.innerHTML = depart.toLocaleDateString();
+        }
+        function validateBooking() {
+            // ensure name field is not empty
+            if (!custName.value) {
+                alert("Please enter your name.");
+                custName.focus();
+                return false;
+            }
+            // ensure numPeople field has a valid number
+            if (Number(numPeople.value) < 1) {
+                alert("Invalid number of people entered.");
+                numPeople.focus();
+                return false;
+            }
+            // require manual quotes for large bookings
+            if (Number(numPeople.value) > 10) {
+                alert("For bookings of more than 10 people, please contact us directly for a quote.");
+                return false;
+            }
+            // ensure numNights field has a valid number
+            if (Number(numNights.value) < 1) {
+                alert("Invalid number of nights entered.");
+                numNights.focus();
+                return false;
+            }
+            // require manual quotes for long stays
+            if (Number(numNights.value) > 14) {
+                alert("For bookings longer than 2 weeks, please contact us directly for a quote.");
+                return false;
+            }
+            // calculate arrival date, today's date and the date next week
+            var arrival = new Date(DoA.value), today = new Date();
+            var nextWeek = new Date();
+            nextWeek.setDate(nextWeek.getDate() + 6);
+            // ensure arrival date is after today
+            if (arrival < today) {
+                alert("Your date of arrival must be in the future.");
+                DoA.focus();
+                return false;
+            }
+            // require manual quotes for short notice bookings (under 1 week from today)
+            if (arrival < nextWeek) {
+                alert("Your booking must be made at least 1 week in advance.\nFor short notice bookings, please contact us directly.");
+                return false;
+            }
+            // at this point the form validation is successful
+            // save the user's name in localstorage for next time
+            try {
+                localStorage.setItem("name", custName.value);
+            } catch (ignored) {
+                // MS Edge and Internet Explorer throw an unspecified error
+                // when accessing localStorage on a file:/// url
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <!-- the 2nd HTML escape characters (&#xfe0f;) are used to display emoji in variant-16,
+         which makes the base emoji be displayed in their colourful versions -->
+    <h1 id="header">&#9992;&#xfe0f; Trendy Travel Agency &#x1f3dd;&#xfe0f;</h1>
+    <p>
+        <a href="#" onclick="window.history.back();">Go Back</a>
+    </p>
+    <h2 id="destination"></h2>
+    <div id="about"></div>
+
+    <div id="details">
+        <h3>Pictures</h3>
+        <div id="slideshow-wrapper">
+            <button onclick="changeSlide(slideshow, true);">&#x1f844;</button>
+            <div id="slideshow"></div>
+            <button onclick="changeSlide(slideshow);">&#x1f846;</button>
+        </div>
+        <details id="copyright-attribution">
+            <summary>Image Sources</summary>
+
+            <ul>
+                <li>
+                    <a href="https://www.flickr.com/photos/54238124@N00/1370768611">Dingle Harbour</a>.
+                    License: <a href="https://creativecommons.org/licenses/by/2.0/">CC BY 2.0</a>
+                </li>
+                <li>
+                    <a href="https://www.flickr.com/photos/166486267@N06/43141137870">Kerry Cliffs</a>.
+                    License: <a href="https://creativecommons.org/publicdomain/mark/1.0/">Public Domain</a>
+                </li>
+                <li>
+                    <a href="https://www.flickr.com/photos/diversey/24935513923">Ring of Kerry</a>.
+                    License: <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC BY-SA 2.0</a>
+                </li>
+                <li>
+                    <a href="https://commons.wikimedia.org/wiki/File:Tower_Bridge_from_Shad_Thames.jpg">London
+                        Bridge</a>:
+                    License: <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>
+                </li>
+                <li>
+                    <a
+                        href="https://commons.wikimedia.org/wiki/File:Buckingham_Palace_from_gardens,_London,_UK_-_Diliff_(cropped).jpg">
+                        Buckingham Palace</a>:
+                    Photo by David Iliff.
+                    License: <a href="https://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0</a>
+                </li>
+                <li>
+                    <a href="https://commons.wikimedia.org/wiki/File:Trafalgar_Square,_London_2_-_Jun_2009.jpg">Trafalgar
+                        Square</a>:
+                    Photo by David Iliff.
+                    License: <a href="https://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0</a>
+                </li>
+                <li>
+                    <a href="https://www.flickr.com/photos/nigel321/2258728772">San Sebastian</a>:
+                    License: <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC BY-SA 2.0</a>
+                </li>
+                <li>
+                    <a href="https://www.flickr.com/photos/tommiehansen/8657695392">San Sebastian 2</a>:
+                    License: <a href="https://creativecommons.org/licenses/by/2.0/">CC BY 2.0</a>
+                </li>
+                <li>
+                    <a href="https://www.flickr.com/photos/dynamosquito/4176620458">San Sebastian Beach</a>:
+                    License: <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC BY-SA 2.0</a>
+                </li>
+            </ul>
+        </details>
+
+        <form id="book" action="booked.html">
+            <h3>Book your stay</h3>
+            <table>
+                <tr>
+                    <td><label for="custName">Your name: </label></td>
+                    <td><input type="text" id="custName"></td>
+                </tr>
+                <tr>
+                    <td><label for="numPeople">Number of people: </label></td>
+                    <td><input type="number" id="numPeople" min="1" value="1" oninput="updateBookingCalculations();">
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="numNights">Number of nights: </label></td>
+                    <td><input type="number" id="numNights" min="1" value="1" oninput="updateBookingCalculations();">
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="DoA">Date of Arrival: </label></td>
+                    <td><input type="date" id="DoA" onchange="updateBookingCalculations();"></td>
+                </tr>
+                <tr>
+                    <td>Date of Departure: </td>
+                    <td><span id="DoD"></span></td>
+                </tr>
+            </table>
+            <p>
+                &#163;<span id="pppnCost"></span> per person per night<br>
+                Total: &#163;<span id="totalCost"></span>
+            </p>
+            <input type="submit" value="Book">
+            <input type="reset" value="Clear">
+        </form>
+    </div>
+</body>
+
+</html>
