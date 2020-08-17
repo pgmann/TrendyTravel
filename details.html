@@ -13,17 +13,17 @@
             'County Kerry': {
                 about: "Kerry boasts some of the most scenic spots in Ireland, including the Dingle harbour and Ring of Kerry.",
                 cost: 80,
-                imgs: ['ring_of_kerry.jpg', 'kerry_cliffs.jpg', 'dingle_harbour.jpg']
+                imgs: ['ring_of_kerry', 'kerry_cliffs', 'dingle_harbour']
             },
             London: {
                 about: "London is a busy city packed with things to do and places to see. From the iconic London Eye to the Aquarium and Science Museum, there'll be plenty to keep you busy! There are also many cultural museums and historic buildings to visit.",
                 cost: 120,
-                imgs: ['london_bridge.jpg', 'buckingham_palace.jpg', 'trafalgar_square.jpg']
+                imgs: ['london_bridge', 'buckingham_palace', 'trafalgar_square']
             },
             'San Sebastian': {
                 about: "",
                 cost: 200,
-                imgs: ['san_sebastian.jpg', 'san_sebastian_2.jpg', 'san_sebastian_beach.jpg']
+                imgs: ['san_sebastian', 'san_sebastian_2', 'san_sebastian_beach']
             }
         }
         // determine the destination to display based on current URL hash component
@@ -39,7 +39,8 @@
                 var first = true;
                 for (let src of destData[dest].imgs) {
                     var img = document.createElement("img");
-                    img.src = "media/" + src;
+                    img.src = "media/" + src + ".jpg";
+                    img.alt = src.replace("_", " ");
                     if (first) {
                         img.classList.add("active-slide");
                         first = false;
