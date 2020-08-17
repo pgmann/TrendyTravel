@@ -65,6 +65,8 @@
 
                 // make sure the form is valid before submitting it
                 book.onsubmit = validateBooking;
+                // update calculations *after* the form resets
+                book.onreset = () => setTimeout(() => updateBookingCalculations());
             } else {
                 // invalid destination name, show error message with link to go to index
                 dest = null;
