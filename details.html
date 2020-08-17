@@ -40,7 +40,7 @@
                 for (let src of destData[dest].imgs) {
                     var img = document.createElement("img");
                     img.src = "media/" + src + ".jpg";
-                    img.alt = src.replace("_", " ");
+                    img.alt = src.replace(/_/g, " ");
                     if (first) {
                         img.classList.add("active-slide");
                         first = false;
